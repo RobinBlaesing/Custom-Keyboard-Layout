@@ -8,6 +8,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputConnection;
 
+import java.util.List;
+
 
 public class MyInputMethodService extends InputMethodService implements KeyboardView.OnKeyboardActionListener {
 
@@ -26,7 +28,24 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
     }
 
     @Override
-    public void onPress(int i) {
+    public void onPress(int primaryCode) {
+
+        Keyboard currentKeyboard = keyboard;
+        List<Keyboard.Key> keys = currentKeyboard.getKeys();
+        keyboardView.invalidateKey(primaryCode);
+
+        for(int i = 0; i < keys.size() - 1; i++ )
+        {
+            Keyboard.Key currentKey = keys.get(i);
+
+            //If your Key contains more than one code, then you will have to check if the codes array contains the primary code
+            if(currentKey.codes[0] == primaryCode)
+            {
+                currentKey.x = currentKey.x + 10;
+                currentKey.y = currentKey.y + 10;
+                break; // leave the loop once you find your match
+            }
+        }
 
     }
 
