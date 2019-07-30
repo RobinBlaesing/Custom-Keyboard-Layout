@@ -8,7 +8,10 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputConnection;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
+import java.util.*;
 
 
 public class MyInputMethodService extends InputMethodService implements KeyboardView.OnKeyboardActionListener {
@@ -17,6 +20,8 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
     private Keyboard keyboard;
 
     private boolean caps = false;
+
+    private List<Keyboard.Key> currentWord = new ArrayList<Keyboard.Key>();
 
     @Override
     public View onCreateInputView() {
@@ -41,8 +46,20 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
             //If your Key contains more than one code, then you will have to check if the codes array contains the primary code
             if(currentKey.codes[0] == primaryCode)
             {
-                currentKey.x = currentKey.x + 10;
-                currentKey.y = currentKey.y + 10;
+                CharSequence cs = "SPACE";
+                if (!currentKey.label.toString().equals(cs.toString())) {
+                    currentWord.add(currentKey);
+                    System.out.println(currentKey.label);
+                }
+                else {
+                    if(!currentWord.isEmpty()){
+                        KeyMotion keyMotionMethods = new KeyMotion();
+                        keyMotionMethods.newWord(currentWord,keyboard);
+                        currentWord.clear();
+                        System.out.println("Word finished");
+                    }
+                }
+
                 break; // leave the loop once you find your match
             }
         }
