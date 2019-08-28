@@ -54,9 +54,10 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
                 else {
                     if(!currentWord.isEmpty()){
                         KeyMotion keyMotionMethods = new KeyMotion();
-                        keyMotionMethods.newWord(currentWord,keyboard);
+                        keyMotionMethods.newWord(currentWord,keyboard,keyboardView);
                         currentWord.clear();
                         System.out.println("Word finished");
+                        keyboardView.invalidateAllKeys();
                     }
                 }
 
