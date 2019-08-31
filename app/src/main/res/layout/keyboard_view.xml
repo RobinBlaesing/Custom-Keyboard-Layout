@@ -4,8 +4,10 @@
     android:id="@+id/keyboard_view"
     android:keyPreviewLayout="@layout/keyboard_preview"
     android:layout_alignParentBottom="true"
-    android:background="@color/colorPrimary"
+    android:background="@color/colorWhite"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:keyBackground="@color/colorLightGrey"
+    android:keyTextColor="@color/colorPrimaryDark">
 
 </android.inputmethodservice.KeyboardView>
