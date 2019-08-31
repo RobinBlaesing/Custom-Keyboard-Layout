@@ -8,36 +8,39 @@ public class KeyMotion {
 
     public void newWord(List<Keyboard.Key> word, Keyboard keyboard)  {
 
+        // If key is at a pixel: true, else: false
         boolean[][] forbiddenArea = setForbiddenArea(keyboard);
+
+        // Key at a certain pixel (not used)
         Keyboard.Key[][] keyArea = setKeyInArea(keyboard);
 
-        // 'a' to 'z' are codes[i] 97 to 122
-        // are set to 0 to 25
+        // Letters      'a' to  'z'
+        // are codes[i] 97  to  122
+        // and set to    0  to   25
+        // in lettersInWord:
         boolean[] lettersInWord = new boolean[26];
 
-        // All keys of keyboard:
-        List<Keyboard.Key> keys = keyboard.getKeys();
-
-        int[] codes = new int[word.size()];
         List<Keyboard.Key> wordWithoutMultiples = new ArrayList<>();
 
-        // Analyze word:
+
+        // Get letters of word:
+
         for (int k = 0; k < word.size(); k++) {
 
             Keyboard.Key key = word.get(k);
-            codes[k] = key.codes[0];
 
             // Check for same letter in word:
-            if (codes[k] >= 97 && codes[k] <= 122) {
-                if (!lettersInWord[codes[k] - 97]) {
+            if (key.codes[0] >= 97 && key.codes[0] <= 122) {
+                if (!lettersInWord[key.codes[0] - 97]) {
                     wordWithoutMultiples.add(key);
                 }
-                lettersInWord[codes[k] - 97] = true;
+                lettersInWord[key.codes[0] - 97] = true;
             }
 
         }
 
-        // Center of mass
+
+        // Center of mass:
 
         int centerOfMassX = 0;
         int centerOfMassY = 0;
@@ -53,13 +56,16 @@ public class KeyMotion {
             centerOfMassY = centerOfMassY / wordWithoutMultiples.size();
         }
 
-        // Move keys:
+
+        // Move all keys of the keyboard:
+
+        List<Keyboard.Key> keys = keyboard.getKeys();
 
         for (int k = 0; k < keys.size(); k++) {
 
             Keyboard.Key key = keys.get(k);
 
-            move(key,lettersInWord,centerOfMassX,centerOfMassY,forbiddenArea,keyArea,keyboard);
+            move(key,lettersInWord,centerOfMassX,centerOfMassY,forbiddenArea,keyboard); // (Function defined below)
 
             forbiddenArea = setForbiddenArea(keyboard);
             keyArea = setKeyInArea(keyboard);
@@ -69,9 +75,11 @@ public class KeyMotion {
     }
 
 
+
     private boolean isInWord(boolean[] lettersInWord, int letterCode){
         return letterCode >= 97 && letterCode <= 122 && lettersInWord[letterCode-97];
     }
+
 
 
     private boolean[][] setForbiddenArea (Keyboard keyboard){
@@ -94,6 +102,7 @@ public class KeyMotion {
     }
 
 
+
     private Keyboard.Key[][] setKeyInArea (Keyboard keyboard){
 
         Keyboard.Key[][] keyArea = new Keyboard.Key[keyboard.getMinWidth()+1][keyboard.getHeight()];
@@ -114,7 +123,8 @@ public class KeyMotion {
     }
 
 
-    private void move(Keyboard.Key key, boolean[] lettersInWord, int moveTowardsX, int moveTowardsY, boolean[][] forbiddenArea, Keyboard.Key[][] keyArea, Keyboard keyboard) {
+
+    private void move(Keyboard.Key key, boolean[] lettersInWord, int moveTowardsX, int moveTowardsY, boolean[][] forbiddenArea, Keyboard keyboard) {
 
         if(isInWord(lettersInWord,key.codes[0])){
 
