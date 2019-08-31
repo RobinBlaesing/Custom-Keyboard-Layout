@@ -54,7 +54,7 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
                 else {
                     if(!currentWord.isEmpty()){
                         KeyMotion keyMotionMethods = new KeyMotion();
-                        for (int countRandom = 0; countRandom < 3; countRandom++){
+                        for (int countRandom = 0; countRandom < 1; countRandom++){
                             keyMotionMethods.newWord(currentWord,keyboard);
                         }
                         currentWord.clear();

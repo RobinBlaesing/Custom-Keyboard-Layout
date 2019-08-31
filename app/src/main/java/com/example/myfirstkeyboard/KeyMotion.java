@@ -12,7 +12,7 @@ public class KeyMotion {
         boolean[][] forbiddenArea = setForbiddenArea(keyboard);
 
         // Key at a certain pixel (not used)
-        Keyboard.Key[][] keyArea = setKeyInArea(keyboard);
+        //Keyboard.Key[][] keyArea = setKeyInArea(keyboard);
 
         // Letters      'a' to  'z'
         // are codes[i] 97  to  122
@@ -68,7 +68,7 @@ public class KeyMotion {
             move(key,lettersInWord,centerOfMassX,centerOfMassY,forbiddenArea,keyboard); // (Function defined below)
 
             forbiddenArea = setForbiddenArea(keyboard);
-            keyArea = setKeyInArea(keyboard);
+            //keyArea = setKeyInArea(keyboard);
 
         }
 
