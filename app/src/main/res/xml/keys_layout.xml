@@ -55,7 +55,7 @@
         <!-- 63,33,64,58,47,35 = \?, !, \@, :, /, \# -->
         <Key android:codes="63,33,64,58,47,35" android:keyLabel="\?!\@" android:keyWidth="60dp" android:keyEdgeFlags="left"/>
         <Key android:codes="44" android:keyLabel="," android:keyWidth="45dp"/>
-        <Key android:codes="32" android:keyLabel="SPACE" android:keyWidth="200dp" android:isRepeatable="true"/>
+        <Key android:codes="32" android:keyLabel="SPACE" android:keyWidth="200dp"/>
         <Key android:codes="46" android:keyLabel="." android:keyWidth="45dp"/>
         <Key android:codes="-4" android:keyBackground="@color/colorGrey" android:keyLabel="DONE" android:keyWidth="60dp" android:keyEdgeFlags="right"/>
     </Row>

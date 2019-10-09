@@ -1,5 +1,6 @@
 package com.example.myfirstkeyboard;
 
+import android.content.Context;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
@@ -7,6 +8,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputMethodManager;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -21,7 +23,9 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
 
     private boolean caps = false;
 
-    private List<Keyboard.Key> currentWord = new ArrayList<Keyboard.Key>();
+    private boolean pressFlag = false;
+
+    private List<Keyboard.Key> currentWord = new ArrayList<>();
 
     @Override
     public View onCreateInputView() {
@@ -72,6 +76,12 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
     @Override
     public void onRelease(int i) {
 
+    }
+
+    private void onSpaceBarLongPress() {
+        InputMethodManager imm = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showInputMethodPicker();
     }
 
 
