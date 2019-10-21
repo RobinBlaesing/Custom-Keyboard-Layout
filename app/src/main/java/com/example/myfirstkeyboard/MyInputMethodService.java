@@ -43,6 +43,12 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
         List<Keyboard.Key> keys = currentKeyboard.getKeys();
         keyboardView.invalidateKey(primaryCode);
 
+        if(primaryCode == -6){
+            InputMethodManager imm = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showInputMethodPicker();
+        }
+
         for(int i = 0; i < keys.size() - 1; i++ )
         {
             Keyboard.Key currentKey = keys.get(i);
@@ -56,10 +62,11 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
                     System.out.println(currentKey.label);
                 }
                 else {
+
                     if(!currentWord.isEmpty()){
-                        KeyMotion keyMotionMethods = new KeyMotion();
-                        for (int countRandom = 0; countRandom < 1; countRandom++){
-                            keyMotionMethods.newWord(currentWord,keyboard);
+                            KeyMotion keyMotionMethods = new KeyMotion();
+                            for (int countRandom = 0; countRandom < 1; countRandom++){
+                                keyMotionMethods.newWord(currentWord,keyboard);
                         }
                         currentWord.clear();
                         System.out.println("Word finished");
@@ -78,10 +85,12 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
 
     }
 
-    private void onSpaceBarLongPress() {
+    public boolean spaceLongPress() {
+        System.out.println("HI");
         InputMethodManager imm = (InputMethodManager)
                 getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showInputMethodPicker();
+        return true;
     }
 
 
