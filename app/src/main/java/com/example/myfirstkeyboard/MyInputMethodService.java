@@ -21,9 +21,9 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
     private KeyboardView keyboardView;
     private Keyboard keyboard;
 
-    private boolean caps = false;
+    private KeyMotion keyMotionMethods = new KeyMotion();
 
-    private boolean pressFlag = false;
+    private boolean caps = false;
 
     private List<Keyboard.Key> currentWord = new ArrayList<>();
 
@@ -33,6 +33,7 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
         keyboard = new Keyboard(this, R.xml.keys_layout);
         keyboardView.setKeyboard(keyboard);
         keyboardView.setOnKeyboardActionListener(this);
+        keyboardView.setPreviewEnabled(false);
         return keyboardView;
     }
 
@@ -56,15 +57,14 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
             //If your Key contains more than one code, then you will have to check if the codes array contains the primary code
             if(currentKey.codes[0] == primaryCode)
             {
-                CharSequence cs = "SPACE";
-                if (!currentKey.label.toString().equals(cs.toString())) {
+                // Add to word if not 'SPACE'
+                if (!(primaryCode == 32)) {
                     currentWord.add(currentKey);
                     System.out.println(currentKey.label);
                 }
                 else {
 
                     if(!currentWord.isEmpty()){
-                            KeyMotion keyMotionMethods = new KeyMotion();
                             for (int countRandom = 0; countRandom < 1; countRandom++){
                                 keyMotionMethods.newWord(currentWord,keyboard);
                         }
@@ -108,7 +108,9 @@ public class MyInputMethodService extends InputMethodService implements Keyboard
                     } else {
                         inputConnection.commitText("", 1);
                     }
+                    break;
                 case Keyboard.KEYCODE_SHIFT:
+                    System.out.println(Keyboard.KEYCODE_SHIFT + " " + primaryCode);
                     caps = !caps;
                     keyboard.setShifted(caps);
                     keyboardView.invalidateAllKeys();

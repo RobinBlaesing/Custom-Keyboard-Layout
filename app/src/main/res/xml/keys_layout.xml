@@ -51,13 +51,13 @@
         <Key android:codes="109" android:keyLabel="m"/>
         <Key android:codes="-5" android:keyLabel="DEL" android:keyWidth="65dp" android:isRepeatable="true" android:keyEdgeFlags="right"/>
     </Row>
-    <Row android:horizontalGap="0dp" android:keyHeight="50dp" android:verticalGap="20dp" android:rowEdgeFlags="bottom">
+    <Row android:horizontalGap="10dp" android:keyHeight="50dp" android:verticalGap="20dp" android:rowEdgeFlags="bottom">
         <!-- 63,33,64,58,47,35 = \?, !, \@, :, /, \# -->
-        <Key android:codes="63,33,64,58,47,35" android:keyLabel="\?!\@" android:keyWidth="60dp" android:keyEdgeFlags="left"/>
-        <Key android:codes="44" android:keyLabel="," android:keyWidth="55dp"/>
-        <Key android:codes="-6" android:keyLabel="\u269B" android:keyOutputText="" android:keyWidth="40dp"/>
-        <Key android:codes="32" android:keyLabel="SPACE" android:keyWidth="150dp"/>
-        <Key android:codes="46" android:keyLabel="." android:keyWidth="45dp"/>
+        <Key android:codes="63,33,64,58,47,35" android:keyLabel="\?!\@:/\#" android:keyWidth="90dp" android:horizontalGap="0dp" android:keyEdgeFlags="left"/>
+        <Key android:codes="44" android:keyLabel="," android:keyWidth="30dp"/>
+        <Key android:codes="-6" android:keyLabel="\u269B" android:keyOutputText="" android:keyWidth="30dp"/>
+        <Key android:codes="32" android:keyLabel=" " android:keyWidth="120dp"/>
+        <Key android:codes="46" android:keyLabel="." android:keyWidth="30dp"/>
         <Key android:codes="-4" android:keyBackground="@color/colorGrey" android:keyLabel="DONE" android:keyWidth="60dp" android:keyEdgeFlags="right"/>
     </Row>
 </Keyboard>

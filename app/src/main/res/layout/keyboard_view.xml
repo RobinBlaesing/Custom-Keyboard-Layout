@@ -7,7 +7,9 @@
     android:background="@color/colorLightGrey"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:keyBackground="@color/colorLightGrey"
-    android:keyTextColor="@color/colorPrimaryDark"
-    android:keyTextSize="25sp">
+    android:keyBackground="@color/colorWhite"
+    android:keyTextColor="@color/colorDark"
+    android:keyTextSize="25sp"
+    android:verticalCorrection="2dp"
+    >
 </android.inputmethodservice.KeyboardView>

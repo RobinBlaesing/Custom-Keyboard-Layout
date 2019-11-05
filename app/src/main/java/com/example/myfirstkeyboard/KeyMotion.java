@@ -6,13 +6,66 @@ import java.util.List;
 
 public class KeyMotion {
 
+    private final static int IN_WORD_MOVEMENT_X = 10;
+    private final static int IN_WORD_MOVEMENT_Y = 2;
+
+    private final static int OUT_WORD_MOVEMENT_X = 10;
+    private final static int OUT_WORD_MOVEMENT_Y = 10;
+
+
+    private final static int REPEAT_MOTION_CYCLES = 6;
+
+
+    private class AreaOfKeys {
+
+        boolean[][] keyIsAtPosition;
+        int[][] keyIdAtPosition; // Key number on keyboard
+
+        private AreaOfKeys (Keyboard keyboard){
+            keyIsAtPosition = new boolean[keyboard.getMinWidth()+1][keyboard.getHeight()];
+            keyIdAtPosition = new int[keyboard.getMinWidth()+1][keyboard.getHeight()];
+            setArea(keyboard);
+        }
+
+        private void setArea(Keyboard keyboard){
+
+            List<Keyboard.Key> keys = keyboard.getKeys();
+
+            for (int k = 0; k < keys.size(); k++) {
+                Keyboard.Key key = keys.get(k);
+                for (int x = key.x; x < key.x + key.width; x++){
+                    for (int y = key.y; y < key.y + key.height; y++){
+                        this.keyIsAtPosition[x][y] = true;
+                        this.keyIdAtPosition[x][y] = k;
+                    }
+                }
+            }
+
+        }
+
+        public boolean getKeyIsAtPositionArea (int x, int y) {
+            return this.keyIsAtPosition[x][y];
+        }
+
+        public int getKeyIdAtPosition (int x, int y) {
+            return this.keyIdAtPosition[x][y];
+        }
+
+        public boolean[][] keyIsAtPositionArea () {
+            return this.keyIsAtPosition;
+        }
+
+        public int[][] keyIdAtPosition () {
+            return this.keyIdAtPosition;
+        }
+
+    }
+
+
     public void newWord(List<Keyboard.Key> word, Keyboard keyboard)  {
 
         // If key is at a pixel: true, else: false
-        boolean[][] forbiddenArea = setForbiddenArea(keyboard);
-
-        // Key at a certain pixel (not used)
-        //Keyboard.Key[][] keyArea = setKeyInArea(keyboard);
+        AreaOfKeys area = new AreaOfKeys(keyboard);
 
         // Letters      'a' to  'z'
         // are codes[i] 97  to  122
@@ -22,9 +75,7 @@ public class KeyMotion {
 
         List<Keyboard.Key> wordWithoutMultiples = new ArrayList<>();
 
-
         // Get letters of word:
-
         for (int k = 0; k < word.size(); k++) {
 
             Keyboard.Key key = word.get(k);
@@ -39,8 +90,12 @@ public class KeyMotion {
 
         }
 
+        // Move all keys of the keyboard:
+        moveAllKeysOnKeyboard(keyboard, lettersInWord, calculateCenterOfMass(wordWithoutMultiples), area);
 
-        // Center of mass:
+    }
+
+    private int[] calculateCenterOfMass (List<Keyboard.Key> wordWithoutMultiples){
 
         int centerOfMassX = 0;
         int centerOfMassY = 0;
@@ -51,29 +106,15 @@ public class KeyMotion {
             centerOfMassY += key.y;
         }
 
+        int[] centerOfMass = new int[2];
+
         if (wordWithoutMultiples.size() != 0) {
-            centerOfMassX = centerOfMassX / wordWithoutMultiples.size();
-            centerOfMassY = centerOfMassY / wordWithoutMultiples.size();
+            centerOfMass[0] = centerOfMassX / wordWithoutMultiples.size();
+            centerOfMass[1] = centerOfMassY / wordWithoutMultiples.size();
         }
 
-
-        // Move all keys of the keyboard:
-
-        List<Keyboard.Key> keys = keyboard.getKeys();
-
-        for (int k = 0; k < keys.size(); k++) {
-
-            Keyboard.Key key = keys.get(k);
-
-            move(key,lettersInWord,centerOfMassX,centerOfMassY,forbiddenArea,keyboard); // (Function defined below)
-
-            forbiddenArea = setForbiddenArea(keyboard);
-            //keyArea = setKeyInArea(keyboard);
-
-        }
-
+        return centerOfMass;
     }
-
 
 
     private boolean isInWord(boolean[] lettersInWord, int letterCode){
@@ -81,167 +122,104 @@ public class KeyMotion {
     }
 
 
-
-    private boolean[][] setForbiddenArea (Keyboard keyboard){
-
-        boolean[][] forbiddenArea = new boolean[keyboard.getMinWidth()+1][keyboard.getHeight()];
+    /// Move all keys of the keyboard:
+    private void moveAllKeysOnKeyboard (Keyboard keyboard, boolean[] lettersInWord,int[] centerOfMass, AreaOfKeys areaOfKeys) {
 
         List<Keyboard.Key> keys = keyboard.getKeys();
 
         for (int k = 0; k < keys.size(); k++) {
+
             Keyboard.Key key = keys.get(k);
-            for (int x = key.x; x < key.x + key.width; x++){
-                for (int y = key.y; y < key.y + key.height; y++){
-                    forbiddenArea[x][y] = true;
+
+
+            class Motion {
+
+                private Keyboard.Key key;
+                private boolean[][] forbiddenArea;
+
+                public Motion(Keyboard.Key key, AreaOfKeys area){
+                    this.key = key;
+                    this.forbiddenArea = area.keyIsAtPosition;
                 }
-            }
-        }
 
-        return forbiddenArea;
-
-    }
-
-
-
-    private Keyboard.Key[][] setKeyInArea (Keyboard keyboard){
-
-        Keyboard.Key[][] keyArea = new Keyboard.Key[keyboard.getMinWidth()+1][keyboard.getHeight()];
-
-        List<Keyboard.Key> keys = keyboard.getKeys();
-
-        for (int k = 0; k < keys.size(); k++) {
-            Keyboard.Key key = keys.get(k);
-            for (int x = key.x; x < key.x + key.width; x++){
-                for (int y = key.y; y < key.y + key.height; y++){
-                    keyArea[x][y] = key;
+                private void inWord (int[] centerOfMass) {
+                    for(int s = 0; s < IN_WORD_MOVEMENT_X; s++) {
+                        int xStep = (int) (Math.signum(centerOfMass[0] - key.x));
+                        int newXPosition = key.x + xStep;
+                        this.xDirection(newXPosition);
+                    }
+                    for(int s = 0; s < IN_WORD_MOVEMENT_Y; s++){
+                        int yStep = (int) (Math.signum(centerOfMass[1] - key.y));
+                        int newYPosition = key.y + yStep;
+                        this.yDirection(newYPosition);
+                    }
                 }
-            }
-        }
 
-        return keyArea;
-
-    }
-
-
-
-    private void move(Keyboard.Key key, boolean[] lettersInWord, int moveTowardsX, int moveTowardsY, boolean[][] forbiddenArea, Keyboard keyboard) {
-
-        if(isInWord(lettersInWord,key.codes[0])){
-
-            int inWordMovementX = 5;
-            int inWordMovementY = 1;
-
-            // Note: Check each corner in motion direction!
-
-            int xMotionDirection = (int) (Math.signum(moveTowardsX - key.x))*inWordMovementX;
-            int newXPosition = key.x + xMotionDirection;
-            if(xMotionDirection > 0){
-                if (!forbiddenArea[newXPosition + key.width][key.y] && !forbiddenArea[newXPosition + key.width][key.y + key.height]){
-                    key.x = newXPosition;
+                private void outWord () {
+                    // Move only alphabetic characters:
+                    if (key.codes[0] >= 97 && key.codes[0] <= 122) {
+                        for(int s = 0; s < OUT_WORD_MOVEMENT_X; s++) {
+                            int xDirectionPixel = (int) (Math.floor(Math.random() * 2) * 2 - 1);
+                            int newXPosition = key.x + xDirectionPixel;
+                            this.xDirection(newXPosition);
+                        }
+                        for(int s = 0; s < OUT_WORD_MOVEMENT_Y; s++){
+                            int yDirectionPixel = (int) (Math.floor(Math.random() * 2) * 2 - 1);
+                            int newYPosition = key.y + yDirectionPixel;
+                            this.yDirection(newYPosition);
+                        }
+                    }
                 }
-            }
-            else {
-                if (!forbiddenArea[newXPosition][key.y] && !forbiddenArea[newXPosition][key.y + key.height]){
-                    key.x = newXPosition;
-                }
-            }
 
-            int yMotionDirection = (int) (Math.signum(moveTowardsY - key.y)) * inWordMovementY;
-            int newYPosition = key.y + yMotionDirection;
-            if (yMotionDirection > 0) {
-                if (!forbiddenArea[key.x][newYPosition + key.height] && !forbiddenArea[key.x + key.width][newYPosition + key.height]){
-                    key.y = newYPosition;
-                }
-            }
-            else {
-                if (!forbiddenArea[key.x][newYPosition] && !forbiddenArea[key.x + key.width][newYPosition]){
-                    key.y = newYPosition;
-                }
-            }
-
-        }
-        else {
-
-            // Key not in word
-
-            if (key.codes[0] >= 97 && key.codes[0] <= 122) {
-
-                int outWordMovementX = 2;
-                int outWordMovementY = 6;
-
-                // Random motion for all other keys:
-
-                int xMotionDirection = (int) (Math.floor(Math.random() * 2) * 2 - 1) * outWordMovementX;
-                int newXPosition = key.x + xMotionDirection;
-                if (xMotionDirection > 0) {
-                    if (newXPosition + key.width < keyboard.getMinWidth()) {
-                        if (!forbiddenArea[newXPosition + key.width][key.y] && !forbiddenArea[newXPosition + key.width][key.y + key.height]) {
+                private void xDirection (int newXPosition){
+                    if(key.x < newXPosition){
+                        if (!forbiddenArea[newXPosition + key.width][key.y] && !forbiddenArea[newXPosition + key.width][key.y + key.height]){
                             key.x = newXPosition;
                         }
                     }
-                } else {
-                    if (newXPosition > 0) {
-                        if (!forbiddenArea[newXPosition][key.y] && !forbiddenArea[newXPosition][key.y + key.height]) {
+                    else {
+                        if (!forbiddenArea[newXPosition][key.y] && !forbiddenArea[newXPosition][key.y + key.height]){
                             key.x = newXPosition;
                         }
                     }
                 }
-                // Try to move into other direction:
-                if (key.x != newXPosition) {
-                    xMotionDirection = -xMotionDirection;
-                    newXPosition = key.x + xMotionDirection;
-                    if (xMotionDirection > 0) {
-                        if (newXPosition + key.width < keyboard.getMinWidth()) {
-                            if (!forbiddenArea[newXPosition + key.width][key.y] && !forbiddenArea[newXPosition + key.width][key.y + key.height]) {
-                                key.x = newXPosition;
-                            }
-                        }
-                    } else {
-                        if (newXPosition > 0) {
-                            if (!forbiddenArea[newXPosition][key.y] && !forbiddenArea[newXPosition][key.y + key.height]) {
-                                key.x = newXPosition;
-                            }
-                        }
-                    }
-                }
 
-
-                int yMotionDirection = (int) (Math.floor(Math.random() * 2) * 2 - 1) * outWordMovementY;
-                int newYPosition = key.y + yMotionDirection;
-                if (yMotionDirection > 0) {
-                    if (newYPosition + key.height < keyboard.getHeight()) {
-                        if (!forbiddenArea[key.x][newYPosition + key.height] && !forbiddenArea[key.x + key.width][newYPosition + key.height]) {
+                private void yDirection (int newYPosition){
+                    if (key.y < newYPosition) {
+                        if (!forbiddenArea[key.x][newYPosition + key.height] && !forbiddenArea[key.x + key.width][newYPosition + key.height]){
                             key.y = newYPosition;
                         }
                     }
-                } else {
-                    if (newYPosition > 0) {
-                        if (!forbiddenArea[key.x][newYPosition] && !forbiddenArea[key.x + key.width][newYPosition]) {
+                    else {
+                        if (!forbiddenArea[key.x][newYPosition] && !forbiddenArea[key.x + key.width][newYPosition]){
                             key.y = newYPosition;
                         }
                     }
                 }
-                // Try to move into other direction:
-                if (key.y != newYPosition) {
-                    yMotionDirection = -yMotionDirection;
-                    newYPosition = key.y + yMotionDirection;
-                    if (yMotionDirection > 0) {
-                        if (newYPosition + key.height < keyboard.getHeight()) {
-                            if (!forbiddenArea[key.x][newYPosition + key.height] && !forbiddenArea[key.x + key.width][newYPosition + key.height]) {
-                                key.y = newYPosition;
-                            }
-                        }
+            }
+
+
+            Motion keyMotion = new Motion(key,areaOfKeys);
+
+            for (int c = 0; c < REPEAT_MOTION_CYCLES; c++) {
+
+                try {
+                    if (isInWord(lettersInWord, key.codes[0])) {
+                        keyMotion.inWord(centerOfMass);
                     } else {
-                        if (newYPosition > 0) {
-                            if (!forbiddenArea[key.x][newYPosition] && !forbiddenArea[key.x + key.width][newYPosition]) {
-                                key.y = newYPosition;
-                            }
-                        }
+                        keyMotion.outWord();
                     }
+                } catch (java.lang.ArrayIndexOutOfBoundsException e){
+                    System.out.println("WARNING! Key '" + key.label + "' at boundary.");
                 }
+
+                // Update area of keys after each motion:
+                areaOfKeys.setArea(keyboard);
 
             }
+
         }
+
     }
 
 }
